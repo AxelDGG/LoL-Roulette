@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LOL Random</title>
+    <link rel="icon" type="image/png" href="img/image.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="lol-bg-icons">
+      <img class="lol-bg-icon" src="img/top.png" alt="Top" />
+      <img class="lol-bg-icon" src="img/jungle.png" alt="Jungle" />
+      <img class="lol-bg-icon" src="img/mid.png" alt="Mid" />
+      <img class="lol-bg-icon" src="img/ADC.png" alt="Bot" />
+      <img class="lol-bg-icon" src="img/support.png" alt="Support" />
+      <img class="lol-bg-icon" src="img/top.png" alt="Top" />
+      <img class="lol-bg-icon" src="img/jungle.png" alt="Jungle" />
+      <img class="lol-bg-icon" src="img/mid.png" alt="Mid" />
+      <img class="lol-bg-icon" src="img/ADC.png" alt="Bot" />
+      <img class="lol-bg-icon" src="img/support.png" alt="Support" />
+      <img class="lol-bg-icon" src="img/top.png" alt="Top" />
+      <img class="lol-bg-icon" src="img/jungle.png" alt="Jungle" />
+      <img class="lol-bg-icon" src="img/mid.png" alt="Mid" />
+      <img class="lol-bg-icon" src="img/ADC.png" alt="Bot" />
+      <img class="lol-bg-icon" src="img/support.png" alt="Support" />
+    </div>
+    <h1>League of Legends</h1>
+    <div class="carousel-container">
+      <div class="carousel" id="champion-carousel"></div>
+    </div>
+    <div class="main-layout">
+      <div class="info-side">
+        <div class="top-bar">
+          <button class="random-btn" id="random-btn">
+            Selecciona un Campeon Random
+          </button>
+        </div>
+        <div class="champ-title-main" id="champ-title-main"></div>
+        <div class="runes-build-style" id="runes-build-style"></div>
+        <div class="build-category">
+          <div class="build-category-title">Recommended Items</div>
+          <div class="item-row" id="items-row"></div>
+        </div>
+      </div>
+      <div class="splash-side" id="splash-side"></div>
+    </div>
+    <script>
+      const VERSION = "14.10.1";
+      const carousel = document.getElementById("champion-carousel");
+      const champTitleMain = document.getElementById("champ-title-main");
+      const runesBuildStyle = document.getElementById("runes-build-style");
+      const itemsRow = document.getElementById("items-row");
+      const randomBtn = document.getElementById("random-btn");
+      const splashSide = document.getElementById("splash-side");
+
+      let champions = [];
+      let items = [];
+      let runes = [];
+      let selectedIdx = 0;
+
+      function showChampionSplashArt(champion) {
+        splashSide.innerHTML = "";
+        const champKey = champion.id;
+        const splashUrl = `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champKey}_0.jpg`;
+        const img = document.createElement("img");
+        img.src = splashUrl;
+        img.className = "champion-splash-anim";
+        img.alt = champion.name + " splash";
+        splashSide.appendChild(img);
+      }
+
+      function renderRunesPageStyle() {
+        let mainIdx = Math.floor(Math.random() * runes.length);
+        let secIdx =
+          (mainIdx + 1 + Math.floor(Math.random() * (runes.length - 1))) %
+          runes.length;
+        let main = runes[mainIdx];
+        let secondary = runes[secIdx];
+        let mainSelected = main.slots.map(
+          (slot) => slot.runes[Math.floor(Math.random() * slot.runes.length)]
+        );
+        let secondarySlots = secondary.slots.slice();
+        let pickedSlots = [];
+        while (pickedSlots.length < 2) {
+          let i = Math.floor(Math.random() * secondarySlots.length);
+          if (!pickedSlots.includes(i)) pickedSlots.push(i);
+        }
+        let secSelected = pickedSlots.map(
+          (i) =>
+            secondarySlots[i].runes[
+              Math.floor(Math.random() * secondarySlots[i].runes.length)
+            ]
+        );
+        runesBuildStyle.innerHTML = "";
+        [
+          [main, mainSelected, "rune-tree"],
+          [secondary, secSelected, "rune-tree rune-tree-secondary"],
+        ].forEach(([tree, selected, cls]) => {
+          let col = document.createElement("div");
+          col.className = cls;
+          col.innerHTML = `
+      <div class="rune-tree-title">
+        <img src="https://ddragon.leagueoflegends.com/cdn/img/${tree.icon}" width="28" height="28"> ${tree.name}
+      </div>
+    `;
+          tree.slots.forEach((slot, slotIdx) => {
+            let row = document.createElement("div");
+            row.className = "rune-slot-row";
+            slot.runes.forEach((rune) => {
+              let sel = selected.some((selRune) => selRune.id === rune.id)
+                ? "rune-selected"
+                : "";
+              row.innerHTML += `
+          <div>
+            <img class="rune-icon ${sel}" src="https://ddragon.leagueoflegends.com/cdn/img/${rune.icon}" title="${rune.name}">
+            <div class="rune-name">${rune.name}</div>
+          </div>
+        `;
+            });
+            col.appendChild(row);
+          });
+          runesBuildStyle.appendChild(col);
+        });
+      }
+
+      function getRandomItems(n = 6) {
+        const legendaryItems = Object.values(items).filter(
+          (item) =>
+            item.gold &&
+            item.gold.purchasable &&
+            !item.requiredAlly &&
+            !item.into &&
+            item.maps &&
+            item.maps["11"] &&
+            !item.name.toLowerCase().includes("elixir") &&
+            !item.name.toLowerCase().includes("potion") &&
+            !item.name.toLowerCase().includes("ward") &&
+            !item.name.toLowerCase().includes("trinket") &&
+            !item.name.toLowerCase().includes("ornn") &&
+            !item.name.toLowerCase().includes("starter") &&
+            !item.name.toLowerCase().includes("boots")
+        );
+        for (let i = legendaryItems.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [legendaryItems[i], legendaryItems[j]] = [
+            legendaryItems[j],
+            legendaryItems[i],
+          ];
+        }
+        return legendaryItems.slice(0, n);
+      }
+
+      function showBuildForChampion(champion) {
+        const infoSide = document.querySelector(".info-side");
+        infoSide.classList.add("fade-out");
+        setTimeout(() => {
+          champTitleMain.textContent = champion.name;
+          renderRunesPageStyle();
+          const selectedItems = getRandomItems(6);
+          itemsRow.innerHTML = "";
+          selectedItems.forEach((item) => {
+            const el = document.createElement("div");
+            el.className = "item";
+            el.innerHTML = `
+              <img src="https://ddragon.leagueoflegends.com/cdn/${VERSION}/img/item/${item.image.full}" alt="${item.name}">
+              <span class="item-label">${item.name}</span>
+            `;
+            itemsRow.appendChild(el);
+          });
+          showChampionSplashArt(champion);
+          infoSide.classList.remove("fade-out");
+          infoSide.classList.add("fade-in");
+          setTimeout(() => infoSide.classList.remove("fade-in"), 350);
+        }, 200);
+      }
+
+      function renderCarousel(selected) {
+        carousel.innerHTML = "";
+        let windowSize = 7;
+        let offset = Math.floor(windowSize / 2);
+        for (let i = -offset; i <= offset; i++) {
+          let idx = (selected + i + champions.length) % champions.length;
+          let champ = champions[idx];
+          const card = document.createElement("div");
+          card.className = "champion-card" + (i === 0 ? " selected" : "");
+          card.onclick = () => {
+            selectedIdx = idx;
+            renderCarousel(selectedIdx);
+            showBuildForChampion(champions[selectedIdx]);
+          };
+          card.innerHTML = `
+            <img src="https://ddragon.leagueoflegends.com/cdn/${VERSION}/img/champion/${champ.image.full}" alt="${champ.name}">
+            <div class="champion-name">${champ.name}</div>
+          `;
+          carousel.appendChild(card);
+        }
+      }
+
+      function selectRandomChampion() {
+        let randomIdx = Math.floor(Math.random() * champions.length);
+        if (randomIdx === selectedIdx && champions.length > 1) {
+          randomIdx = (randomIdx + 1) % champions.length;
+        }
+        selectedIdx = randomIdx;
+        renderCarousel(selectedIdx);
+        showBuildForChampion(champions[selectedIdx]);
+      }
+      randomBtn.addEventListener("click", selectRandomChampion);
+
+      async function init() {
+        const championsData = await fetch(
+          `https://ddragon.leagueoflegends.com/cdn/${VERSION}/data/es_MX/champion.json`
+        ).then((r) => r.json());
+        champions = Object.values(championsData.data);
+        const itemsData = await fetch(
+          `https://ddragon.leagueoflegends.com/cdn/${VERSION}/data/es_MX/item.json`
+        ).then((r) => r.json());
+        items = itemsData.data;
+        runes = await fetch(
+          `https://ddragon.leagueoflegends.com/cdn/${VERSION}/data/es_MX/runesReforged.json`
+        ).then((r) => r.json());
+        renderCarousel(selectedIdx);
+        showBuildForChampion(champions[selectedIdx]);
+      }
+      init();
+
+      function animateBgIcons() {
+        const icons = document.querySelectorAll(".lol-bg-icon");
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        icons.forEach((icon, i) => {
+          const startX = Math.random() * (vw - 120);
+          const startY = Math.random() * (vh - 120);
+          const endX = Math.random() * (vw - 120);
+          const endY = Math.random() * (vh - 120);
+          const duration = 18 + Math.random() * 12;
+          icon.style.transition = `transform ${duration}s linear, opacity 1s`;
+          icon.style.transform = `translate(${startX}px, ${startY}px)`;
+          setTimeout(() => {
+            icon.style.transform = `translate(${endX}px, ${endY}px)`;
+            setTimeout(() => animateSingleIcon(icon), duration * 1000);
+          }, 100);
+        });
+      }
+
+      function animateSingleIcon(icon) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const endX = Math.random() * (vw - 120);
+        const endY = Math.random() * (vh - 120);
+        const duration = 18 + Math.random() * 12;
+        icon.style.transition = `transform ${duration}s linear, opacity 1s`;
+        icon.style.transform = `translate(${endX}px, ${endY}px)`;
+        setTimeout(() => animateSingleIcon(icon), duration * 1000);
+      }
+
+      window.addEventListener("DOMContentLoaded", animateBgIcons);
+      window.addEventListener("resize", animateBgIcons);
+    </script>
+  </body>
+</html>

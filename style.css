@@ -1,0 +1,388 @@
+/* Fondo dinámico canvas */
+#lol-bg-canvas {
+  position: fixed;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* Cambia la fuente a la oficial de League of Legends */
+body {
+  background: #151a23;
+  color: #eee;
+  font-family: "Beaufort for LOL", "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+h1,
+h2,
+.titulo-lol {
+  font-family: "Cinzel", serif;
+}
+h1 {
+  text-align: center;
+  font-size: 2.7em;
+  margin-top: 1.2em;
+  color: #ffd700;
+  letter-spacing: 2px;
+}
+.main-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2.5em;
+  margin: 2em auto 2em;
+  max-width: 1280px;
+  padding: 0 2vw;
+}
+.info-side {
+  flex: 0 1 490px;
+  min-width: 320px;
+  max-width: 530px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.carousel-container {
+  display: flex;
+  margin-bottom: 1.1em;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  justify-content: center;
+  height: 250px;
+}
+.top-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1.3em;
+  margin-bottom: 0.7em;
+}
+.random-btn {
+  background: #ffd700;
+  color: #181a23;
+  font-weight: bold;
+  border: none;
+  border-radius: 7px;
+  padding: 0.7em 1.4em;
+  font-size: 1.07em;
+  cursor: pointer;
+  box-shadow: 0 1px 8px #0004;
+  transition: background 0.15s, color 0.15s, transform 0.12s;
+}
+.random-btn:hover {
+  background: #ffe352;
+  color: #181a23;
+  transform: scale(1.06);
+}
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: 1.7em;
+  transition: transform 0.5s cubic-bezier(0.4, 2.3, 0.3, 1);
+  will-change: transform;
+}
+.champion-card {
+  flex: 0 0 105px;
+  background: #232b3a;
+  border-radius: 12px;
+  padding: 0.55em;
+  box-shadow: 0 2px 12px #0003;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.6;
+  transform: scale(0.95);
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.15s;
+  border: 2px solid transparent;
+  position: relative;
+  z-index: 1;
+}
+.champion-card img {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2.7px solid #333b;
+  object-fit: cover;
+  background: #202430;
+  margin-bottom: 0.33em;
+  transition: border 0.18s;
+}
+.champion-card .champion-name {
+  font-size: 0.99em;
+  font-weight: 500;
+  color: #ffd700;
+}
+.champion-card.selected {
+  opacity: 1;
+  transform: scale(1.22);
+  box-shadow: 0 4px 34px #ffd70070, 0 1px 8px #000a;
+  border: 2px solid #ffd700;
+  z-index: 2;
+}
+.champion-card.selected img {
+  border: 2.7px solid #ffd700;
+}
+.champ-title-main {
+  color: #ffd700;
+  font-size: 2em;
+  text-align: left;
+  margin-bottom: 0.6em;
+  margin-top: 0.7em;
+  letter-spacing: 1.1px;
+  line-height: 1.08;
+  text-shadow: 0 2px 8px #000c;
+}
+/* --- Runas estilo página --- */
+.runes-build-style {
+  display: flex;
+  gap: 2.2em;
+  justify-content: center;
+  margin-bottom: 2.2em;
+}
+.rune-tree {
+  background: #1b2030;
+  padding: 1em 1.3em 1.1em 1.3em;
+  border-radius: 15px;
+  box-shadow: 0 2px 18px #0005;
+  min-width: 192px;
+  max-width: 232px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.rune-tree-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  letter-spacing: 1px;
+}
+.rune-slot-row {
+  display: flex;
+  gap: 1.1em;
+  margin-bottom: 0.49em;
+  justify-content: center;
+}
+.rune-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #161926;
+  border: 2.5px solid transparent;
+  box-shadow: 0 1px 7px #0006;
+  opacity: 0.29;
+  transition: opacity 0.15s, border 0.17s;
+  display: block;
+  margin-bottom: 0.2em;
+}
+.rune-selected {
+  opacity: 1 !important;
+  border-color: #ffd700;
+  background: #252545;
+  box-shadow: 0 2px 12px #ffd70080;
+}
+.rune-name {
+  color: #eee;
+  font-size: 0.86em;
+  text-align: center;
+  max-width: 58px;
+  margin-top: 0.09em;
+  opacity: 0.85;
+}
+.rune-tree-secondary .rune-selected {
+  border-color: #ff5560;
+  box-shadow: 0 2px 9px #ff556088;
+}
+.rune-tree-secondary .rune-tree-title {
+  color: #ff5560;
+}
+/* --- Objetos (items) --- */
+.build-category-title {
+  font-weight: bold;
+  margin-bottom: 0.45em;
+  color: #ffd700bb;
+  font-size: 1.08em;
+  margin-left: 0.2em;
+}
+.item-row {
+  display: flex;
+  gap: 1.13em;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+}
+.item img {
+  width: 39px;
+  height: 39px;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px #0007;
+  background: #21242d;
+  margin-bottom: 0.17em;
+  border: 2px solid #ffd70055;
+}
+.item-label {
+  color: #eee;
+  font-size: 0.79em;
+  text-align: center;
+  max-width: 68px;
+  word-break: break-word;
+  opacity: 0.82;
+}
+/* --- Splash art side --- */
+.splash-side {
+  flex: 1 1 440px;
+  min-width: 260px;
+  max-width: 840px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+  max-height: 864px;
+
+  margin-top: 15%;
+}
+.champion-splash-anim {
+  max-width: 95%;
+  width: auto;
+  height: 664px;
+  border-radius: 22px;
+  box-shadow: 0 10px 60px #000e, 0 2px 14px #ffd70015;
+  opacity: 0;
+  transform: translateX(100vw);
+  animation: slideInSimple 1.3s cubic-bezier(0.44, 1, 0.6, 1) forwards;
+  background: #151a23;
+  z-index: 4;
+  position: static;
+}
+@keyframes slideInSimple {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fondo animado de iconos individuales de roles de LoL */
+.lol-bg-icons {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.lol-bg-icon {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  opacity: 0.13;
+  filter: none;
+  will-change: transform, opacity;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  /* Cada icono tendrá su propia animación inline por JS */
+}
+
+/* Animación para suavizar el cambio de personaje en el carrusel */
+.champion-card,
+.champion-card img {
+  transition: transform 0.35s cubic-bezier(0.4, 1.4, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.4, 1.4, 0.3, 1),
+    opacity 0.25s cubic-bezier(0.4, 1.4, 0.3, 1),
+    border 0.25s cubic-bezier(0.4, 1.4, 0.3, 1);
+}
+
+/* Animación para suavizar el cambio de contenido en info-side */
+.info-side {
+  /* Aplica transición de opacidad y leve desplazamiento */
+  transition: opacity 0.35s cubic-bezier(0.4, 1.4, 0.3, 1),
+    transform 0.35s cubic-bezier(0.4, 1.4, 0.3, 1);
+  will-change: opacity, transform;
+}
+.info-side.fade-out {
+  opacity: 0;
+  transform: translateY(30px) scale(0.98);
+  pointer-events: none;
+}
+.info-side.fade-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1100px) {
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .splash-side {
+    margin-top: 2.2em;
+    min-height: 340px;
+    max-width: 95vw;
+  }
+  .champion-splash-anim {
+    width: 62vw;
+    min-width: 190px;
+    max-width: 99vw;
+  }
+}
+@media (max-width: 700px) {
+  .main-layout {
+    padding: 0 2vw;
+  }
+  .info-side {
+    min-width: unset;
+    max-width: 99vw;
+  }
+  .champ-title-main {
+    font-size: 1.2em;
+  }
+  .runes-build-style {
+    gap: 0.7em;
+  }
+  .rune-tree {
+    min-width: 90px;
+    padding: 0.4em 0.1em;
+  }
+  .rune-tree-title {
+    font-size: 0.85em;
+  }
+  .item-row {
+    gap: 0.6em;
+  }
+  .item img {
+    width: 25px;
+    height: 25px;
+  }
+  .splash-side {
+    min-height: 190px;
+  }
+  .champion-splash-anim {
+    width: 100vw;
+    min-width: 90px;
+  }
+}
